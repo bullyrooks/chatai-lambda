@@ -31,7 +31,7 @@ class ChatAILambdaStack(Stack):
                                                        "chatai-lambda"),
             tag_or_digest=image_tag
         )
-        chatai_lambda_lambda = _lambda.DockerImageFunction(
+        chatai_lambda = _lambda.DockerImageFunction(
             scope=self,
             id="chatai-lambda-lambda",
             # Function name on AWS
@@ -54,10 +54,11 @@ class ChatAILambdaStack(Stack):
                        ],
             effect=iam.Effect.ALLOW
         )
+        chatai_lambda.role.add_to_policy(ssm_policy_statement)
 
         chatai_lambda_api = apigateway.LambdaRestApi(self, "chatai-lambda-api",
                                                      rest_api_name="ChatAI Lambda",
-                                                     handler=chatai_lambda_lambda,
+                                                     handler=chatai_lambda,
                                                      proxy=False,
                                                      api_key_source_type=apigateway.ApiKeySourceType.HEADER,
                                                      default_integration=apigateway.LambdaIntegration(
