@@ -6,7 +6,7 @@ from aws_cdk import (
     aws_lambda as _lambda,
     aws_apigateway as apigateway,
     aws_iam as iam,
-    aws_certificatemanager as acm,
+    aws_certificatemanager as acm, Duration,
 )
 from aws_cdk.aws_apigateway import (
     SecurityPolicy,
@@ -39,6 +39,7 @@ class ChatAILambdaStack(Stack):
             # Use aws_cdk.aws_lambda.DockerImageCode.from_image_asset to build
             # a docker image on deployment
             code=chatai_lambda_ecr_image,
+            timeout=Duration.seconds(59)
         )
 
         chatai_lambda_domain_name = "chatai.bullyrooks.com"
@@ -59,6 +60,9 @@ class ChatAILambdaStack(Stack):
                                                      handler=chatai_lambda_lambda,
                                                      proxy=False,
                                                      api_key_source_type=apigateway.ApiKeySourceType.HEADER,
+                                                     default_integration=apigateway.IntegrationOptions(
+                                                         timeout=Duration.seconds(60) # Increase the timeout to 10 seconds
+                                                     )
                                                      )
 
         chatai_lambda_api.add_domain_name(

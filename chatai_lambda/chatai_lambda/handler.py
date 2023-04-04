@@ -26,6 +26,7 @@ def get_chatai_response(text):
         stop=None,
         temperature=0.7,
     )
+    logger.info("completions out: %s", completions)
 
     generated_text = completions.choices[0].text
     return generated_text
