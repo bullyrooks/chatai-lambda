@@ -8,7 +8,13 @@ from aws_cdk import (
     aws_iam as iam,
     aws_certificatemanager as acm,
 )
-from aws_cdk.aws_apigateway import SecurityPolicy, EndpointType
+from aws_cdk.aws_apigateway import (
+    SecurityPolicy,
+    EndpointType,
+    ApiKey,
+    UsagePlan,
+    ThrottleSettings,
+)
 from aws_cdk.aws_ecr import Repository
 from constructs import Construct
 
