@@ -4,14 +4,10 @@ from aws_cdk import (
     # Duration,
     Stack,
     aws_lambda as _lambda,
-    aws_apigateway as apigateway)
-from aws_cdk import aws_ssm as ssm
-from aws_cdk.aws_apigateway import (
-    ApiKey,
-    UsagePlan,
-    RestApi,
-    ThrottleSettings,
-    LambdaIntegration)
+    aws_apigateway as apigateway,
+    aws_certificatemanager as acm,
+)
+from aws_cdk.aws_apigateway import SecurityPolicy, EndpointType
 from aws_cdk.aws_ecr import Repository
 from constructs import Construct
 
@@ -38,9 +34,51 @@ class ChatAILambdaStack(Stack):
             code=chatai_lambda_ecr_image,
         )
 
-        chatai_lambda_api = apigateway.LambdaRestApi(self, "chatai-lambda-api",
-                                                        rest_api_name="ChatAI Lambda",
-                                                        handler=chatai_lambda_lambda,
-                                                        proxy=False)
+        chatai_lambda_domain_name = "chatai.bullyrooks.com"
+        # Create a certificate for the domain name
+        chatai_lambda_certificate = acm.Certificate.from_certificate_arn(
+            self, "chatai-lambda_certificate",
+            certificate_arn="arn:aws:acm:us-west-2:108452827623:certificate/5a47eab5-4c2c-414d-8543-092d305d874e")
 
-        chatai_lambda_api.root.add_method("GET")
+        chatai_lambda_api = apigateway.LambdaRestApi(self, "chatai-lambda-api",
+                                                     rest_api_name="ChatAI Lambda",
+                                                     handler=chatai_lambda_lambda,
+                                                     proxy=False,
+                                                     api_key_source_type=apigateway.ApiKeySourceType.HEADER,
+                                                     )
+
+        chatai_lambda_api.add_domain_name(
+            id="chatai-lambda-domain",
+            domain_name=chatai_lambda_domain_name,
+            certificate=chatai_lambda_certificate,
+            security_policy=SecurityPolicy.TLS_1_2,
+            endpoint_type=EndpointType.REGIONAL,
+        )
+
+        chatai_lambda_api.root.add_method("POST", api_key_required=True)
+
+        # Create an API key
+        chatai_integration_key = ApiKey(self, "Chat AI Integration Key",
+                                        api_key_name="chatai-integration-key",
+                                        enabled=True)
+
+        # Create a usage plan
+        development_usage_plan = UsagePlan(self,
+                                           "ChatAI Integration Plan",
+                                           throttle=ThrottleSettings(
+                                               rate_limit=10,  # requests per second
+                                               burst_limit=2  # maximum number of requests in a burst
+                                           ),
+                                           quota=apigateway.QuotaSettings(
+                                               limit=200,  # number of requests
+                                               period=apigateway.Period.DAY  # time period
+                                           )
+                                           )
+
+        # Associate the API key with the usage plan
+        development_usage_plan.add_api_key(chatai_integration_key)
+        # Associate the API stage with the usage plan
+        development_usage_plan.add_api_stage(
+            api=chatai_lambda_api,
+            stage=chatai_lambda_api.deployment_stage
+        )
