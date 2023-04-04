@@ -5,6 +5,7 @@ from aws_cdk import (
     Stack,
     aws_lambda as _lambda,
     aws_apigateway as apigateway,
+    aws_iam as iam,
     aws_certificatemanager as acm,
 )
 from aws_cdk.aws_apigateway import SecurityPolicy, EndpointType
@@ -39,6 +40,13 @@ class ChatAILambdaStack(Stack):
         chatai_lambda_certificate = acm.Certificate.from_certificate_arn(
             self, "chatai-lambda_certificate",
             certificate_arn="arn:aws:acm:us-west-2:108452827623:certificate/5a47eab5-4c2c-414d-8543-092d305d874e")
+
+        ssm_policy_statement = iam.PolicyStatement(
+            actions=["ssm:GetParameter"],
+            resources=["arn:aws:ssm:us-west-2:108452827623:parameter/prod/chatai/*",
+                       ],
+            effect=iam.Effect.ALLOW
+        )
 
         chatai_lambda_api = apigateway.LambdaRestApi(self, "chatai-lambda-api",
                                                      rest_api_name="ChatAI Lambda",
