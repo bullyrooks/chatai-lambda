@@ -39,7 +39,7 @@ class ChatAILambdaStack(Stack):
             # Use aws_cdk.aws_lambda.DockerImageCode.from_image_asset to build
             # a docker image on deployment
             code=chatai_lambda_ecr_image,
-            timeout=Duration.seconds(59)
+            timeout=Duration.seconds(30)
         )
 
         chatai_lambda_domain_name = "chatai.bullyrooks.com"
@@ -62,7 +62,7 @@ class ChatAILambdaStack(Stack):
                                                      proxy=False,
                                                      api_key_source_type=apigateway.ApiKeySourceType.HEADER,
                                                      default_integration=apigateway.LambdaIntegration(
-                                                         timeout=Duration.seconds(60),
+                                                         timeout=Duration.seconds(29),
                                                          handler=chatai_lambda
                                                      )
                                                      )
