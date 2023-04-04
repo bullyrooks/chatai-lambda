@@ -62,7 +62,8 @@ class ChatAILambdaStack(Stack):
                                                      proxy=False,
                                                      api_key_source_type=apigateway.ApiKeySourceType.HEADER,
                                                      default_integration=apigateway.LambdaIntegration(
-                                                         timeout=Duration.seconds(60)
+                                                         timeout=Duration.seconds(60),
+                                                         handler=chatai_lambda
                                                      )
                                                      )
 
