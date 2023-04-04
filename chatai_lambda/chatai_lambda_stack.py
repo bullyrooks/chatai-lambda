@@ -63,6 +63,7 @@ class ChatAILambdaStack(Stack):
         chatai_lambda_api = apigateway.LambdaRestApi(self,
                                                      "chatai-lambda-api",
                                                      rest_api_name="ChatAI Lambda",
+                                                     handler=chatai_lambda,
                                                      proxy=False,
                                                      api_key_source_type=apigateway.ApiKeySourceType.HEADER,
                                                      default_integration=chatai_lambda_integration
