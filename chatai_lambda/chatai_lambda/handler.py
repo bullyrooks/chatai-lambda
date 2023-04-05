@@ -18,17 +18,15 @@ openai.api_key = bottokenresponse["Parameter"]["Value"]
 model = "gpt-3.5-turbo"
 
 def get_chatai_response(text):
-    completions = openai.Completion.create(
-        engine=model,
-        prompt=text,
-        max_tokens=1024,
-        n=1,
-        stop=None,
-        temperature=0.7,
+    response = openai.ChatCompletion.create(
+        model=model,
+        messages=[
+            {"role": "user", "content": text}
+        ]
     )
-    logger.info("completions out: %s", completions)
+    logger.info("completions out: %s", response)
 
-    generated_text = completions.choices[0].text
+    generated_text = response["choices"][0]["message"]["content"]
     return generated_text
 
 def handler(event, context):
