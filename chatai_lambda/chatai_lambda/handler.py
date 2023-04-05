@@ -15,7 +15,7 @@ bottokenresponse = ssm.get_parameter(
 )
 openai.api_key = bottokenresponse["Parameter"]["Value"]
 
-model = "text-davinci-002"
+model = "gpt-3.5-turbo"
 
 def get_chatai_response(text):
     completions = openai.Completion.create(
