@@ -56,17 +56,11 @@ class ChatAILambdaStack(Stack):
         )
         chatai_lambda.role.add_to_policy(ssm_policy_statement)
 
-        chatai_lambda_integration = apigateway.LambdaIntegration(handler=chatai_lambda,
-                                                                 timeout=Duration.seconds(29)
-                                                                 )
-
-        chatai_lambda_api = apigateway.LambdaRestApi(self,
-                                                     "chatai-lambda-api",
+        chatai_lambda_api = apigateway.LambdaRestApi(self, "chatai-lambda-api",
                                                      rest_api_name="ChatAI Lambda",
                                                      handler=chatai_lambda,
                                                      proxy=False,
                                                      api_key_source_type=apigateway.ApiKeySourceType.HEADER,
-                                                     default_integration=chatai_lambda_integration
                                                      )
 
         chatai_lambda_api.add_domain_name(
