@@ -30,10 +30,10 @@ def get_chatai_response(text):
     return generated_text
 
 def handler(event, context):
-    logger.info("handler request in")
+    logger.info("handler request in: %s", event)
 
     # Extract the text from the event data
-    text = event.get("text", "")
+    text = event["text"]
     logger.info("text in: %s", text)
 
     # Get a response from the OpenAI API
