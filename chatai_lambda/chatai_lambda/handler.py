@@ -1,3 +1,4 @@
+import json
 import logging
 import logging.config
 import boto3
@@ -33,7 +34,8 @@ def handler(event, context):
     logger.info("handler request in: %s", event)
 
     # Extract the text from the event data
-    text = event["text"]
+    event_body = json.loads(event['body'])
+    text = event_body['text']
     logger.info("text in: %s", text)
 
     # Get a response from the OpenAI API
@@ -42,5 +44,5 @@ def handler(event, context):
 
     return {
         'statusCode': 200,
-        'body': response
+        'body': json.dumps({'response': response})
     }
